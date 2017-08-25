@@ -107,39 +107,43 @@ order_time DESC;
 ----------------------------------------------------------------------------------------------------------------------------
 -- 3、相同地址-疑似刷单
 START TRANSACTION;
+
 USE tag_explore;
-DROP TABLE 
+
+DROP TABLE
 IF EXISTS kd_trade_brushadd180;
-CREATE TABLE kd_trade_brushadd180 AS
-SELECT
-  tt.buyer_id,
-  CONCAT(MONTH(tt.order_time),'月') AS date_month,
-  DAYOFMONTH(tt.order_time) AS month_day,
-  tt.order_id,
-  tt.order_time,
-  tt.order_payamout,
-  tt.order_add
+
+CREATE TABLE kd_trade_brushadd180 AS SELECT
+	tt.buyer_id,
+	CONCAT(MONTH(tt.order_time), '月') AS date_month,
+	DAYOFMONTH(tt.order_time) AS month_day,
+	tt.order_id,
+	tt.order_time,
+	tt.order_payamout,
+	tt.order_add
 FROM
-(
-	SELECT
-		-- 选择订单数据条件，数据来源：kd_trade_ext
-		cc.sys_trade_id AS order_id,
-		cc.pay_time AS order_time,
-		cc.sys_customer_id AS buyer_id,
-		ROUND(cc.payment, 1) AS order_payamout,
-		kk.receiver_address AS order_add
-	FROM
-		crm_kd.kd_trade cc
-	LEFT JOIN crm_kd.kd_trade_ext kk ON cc.sys_trade_id = kk.sys_trade_id
-	WHERE
-		DATEDIFF(CURDATE(), cc.created) < 181 -- 订单创建日期在18天内
-	AND cc.pay_time IS NOT NULL -- 付款日期不为空
-	AND cc.trade_status IN (
-		'TRADE_BUYER_SIGNED',
-		'TRADE_CLOSED',
-		'TRADE_CLOSED_BY_TAOBAO',
-		'TRADE_FINISHED',
-		'WAIT_BUYER_CONFIRM_GOODS'
-	) -- 订单状态为已发货及已经完成
-	AND cc.plat_from_id <> 597 -- 渠道来源部位淘宝分销
-)tt;
+	(
+		SELECT
+			-- 选择订单数据条件，数据来源：kd_trade_ext
+			cc.sys_trade_id AS order_id,
+			cc.pay_time AS order_time,
+			cc.sys_customer_id AS buyer_id,
+			ROUND(cc.payment, 1) AS order_payamout,
+			kk.receiver_address AS order_add
+		FROM
+			crm_kd.kd_trade cc
+		LEFT JOIN crm_kd.kd_trade_ext kk ON cc.sys_trade_id = kk.sys_trade_id
+		WHERE
+			DATEDIFF(CURDATE(), cc.created) < 181 -- 订单创建日期在18天内
+		AND cc.pay_time IS NOT NULL -- 付款日期不为空
+		AND cc.trade_status IN (
+			'TRADE_BUYER_SIGNED',
+			'TRADE_CLOSED',
+			'TRADE_CLOSED_BY_TAOBAO',
+			'TRADE_FINISHED',
+			'WAIT_BUYER_CONFIRM_GOODS'
+		) -- 订单状态为已发货及已经完成
+		AND cc.plat_from_id <> 597 -- 渠道来源部位淘宝分销
+	) tt;
+
+ROLLBACK;
