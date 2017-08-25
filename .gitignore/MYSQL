@@ -40,3 +40,68 @@ FROM
 	) tt;
 
 ROLLBACK;
+
+-- 二、合并筛选出来的疑似刷单用户
+START TRANSACTION;
+
+USE tag_explore;
+
+DROP TABLE
+IF EXISTS brusher_tag;
+
+CREATE TABLE brusher_tag AS SELECT
+	tt.buyer_id,
+	kk.mobile,
+	tt.order_time,
+	tt.order_id,
+	tt.order_payamout,
+	tt.brusher_tag,
+	tt.brusher_type
+FROM
+	(
+		(
+			SELECT
+				t1.order_time,
+				t1.buyer_id,
+				t1.order_id,
+				t1.order_payamout,
+				t1.brusher_tag,
+				CONCAT('tag01') AS brusher_type
+			FROM
+				tag_explore.brusher_tag01 t1
+		)
+		UNION
+			(
+				SELECT
+					t2.order_time,
+					t2.buyer_id,
+					t2.order_id,
+					t2.order_payamout,
+					t2.tag_tip AS brusher_tag,
+					CONCAT('tag02') AS brusher_type
+				FROM
+					tag_explore.brusher_tag02 t2
+			)
+		UNION
+			(
+				SELECT
+					t3.order_time,
+					t3.buyer_id,
+					t3.order_id,
+					t3.order_payamout,
+					t3.brusher_tag,
+					CONCAT('tag03') AS brusher_type
+				FROM
+					tag_explore.brusher_tag03 t3
+			)
+	) tt
+LEFT JOIN crm_kd.kd_customer kk ON tt.buyer_id = kk.sys_customer_id;
+
+SELECT
+	tt.mobile,
+	COUNT(DISTINCT brusher_type) AS filter_tag
+FROM
+	tag_explore.brusher_tag tt
+GROUP BY
+	tt.mobile;
+
