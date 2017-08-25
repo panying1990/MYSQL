@@ -1,0 +1,159 @@
+#1、全景描述-订货时间分布
+USE temp_data_process;
+DROP TABLE 
+IF EXISTS jd_temp;
+CREATE TABLE jd_temp AS
+SELECT
+  CONCAT(MONTH(tt.order_time),'月') AS date_month,
+  DAYOFMONTH(tt.order_time) AS month_day,
+  COUNT(DISTINCT user_id) AS user_num,
+  COUNT(DISTINCT order_id) AS order_num,
+  ROUND(SUM(tt.order_fee)/1000,2) AS order_fee
+FROM
+(SELECT
+ jj.`订货日期` AS order_time,
+ jj.`买家ID` AS user_id,
+ jj.`订单编号` AS order_id,
+ jj.`订单总金额` AS order_fee
+FROM
+ jd_shop jj
+WHERE
+ jj.`订货日期` IS NOT NULL)tt
+GROUP BY
+date_month,
+month_day;
+
+
+#1、同一买家ID多次购买
+USE temp_data_process;
+DROP TABLE 
+IF EXISTS jd_user;
+CREATE TABLE jd_user AS
+SELECT
+  tt.buyer_id,
+  CONCAT(MONTH(tt.order_time),'月') AS date_month,
+  DAYOFMONTH(tt.order_time) AS month_day,
+  tt.order_id,
+  tt.order_time,
+  ROUND(tt.order_fee,1) AS order_fee,
+  kk.first_pay_time,
+  kk.last_pay_time,
+  ROUND(kk.ordr_diff/kk.order_cunt,1)AS repurchase,
+  kk.ordr_diff,
+  kk.order_cunt,
+  ROUND(kk.user_fee,2) AS user_fee
+FROM
+(SELECT
+ jj.`订单编号` AS order_id,
+ jj.`订货日期` AS order_time,
+ jj.`买家ID` AS buyer_id,
+ jj.`订单总金额` AS order_fee
+ FROM
+jd_shop jj)tt
+LEFT JOIN
+(SELECT
+ jj.`买家ID` AS buyer_id,
+ MIN(jj.`订货日期`) AS first_pay_time,
+ MAX(jj.`订货日期`) AS last_pay_time,
+ COUNT(DISTINCT jj.`订单编号`) AS order_cunt,
+ DATEDIFF(MAX(jj.`订货日期`),MIN(jj.`订货日期`)) AS ordr_diff,
+ SUM(jj.`订单总金额`) AS user_fee
+FROM
+ jd_shop jj
+GROUP BY
+buyer_id
+ORDER BY
+buyer_id)kk
+ON tt.buyer_id=kk.buyer_id;
+
+
+#2、连续相同价格订单价格-疑似刷单
+USE temp_data_process;
+SET @rownum=0;
+DROP TABLE 
+IF EXISTS jd_time;
+CREATE TABLE jd_time AS
+SELECT
+  @rownum:=@rownum+1 AS rownum,
+  tt.buyer_id,
+  CONCAT(MONTH(tt.order_time),'月') AS date_month,
+  DAYOFMONTH(tt.order_time) AS month_day,
+  tt.order_id,
+  tt.order_time,
+  tt.order_fee,
+  kk.order_num
+FROM
+(SELECT
+ jj.`订单编号` AS order_id,
+ jj.`订货日期` AS order_time,
+ jj.`买家ID` AS buyer_id,
+ ROUND(jj.`订单总金额`) AS order_fee
+ FROM
+jd_shop jj)tt
+LEFT JOIN
+(SELECT
+ ROUND(jj.`订单总金额`) AS order_fee,
+ COUNT(DISTINCT jj.`订单编号`)AS order_num
+FROM
+ jd_shop jj
+GROUP BY
+order_fee
+ORDER BY
+order_num DESC)kk
+ON tt.order_fee=kk.order_fee
+ORDER BY
+order_time DESC;
+
+#3、相同地址-疑似刷单
+USE temp_data_process;
+DROP TABLE 
+IF EXISTS jd_add;
+CREATE TABLE jd_add AS
+SELECT
+  tt.buyer_id,
+  CONCAT(MONTH(tt.order_time),'月') AS date_month,
+  DAYOFMONTH(tt.order_time) AS month_day,
+  tt.order_id,
+  tt.order_time,
+  tt.order_fee,
+  kk.order_add
+FROM
+(SELECT
+ jj.`订单编号` AS order_id,
+ jj.`订货日期` AS order_time,
+ jj.`买家ID` AS buyer_id,
+ ROUND(jj.`订单总金额`,1) AS order_fee
+ FROM
+jd_shop jj)tt
+LEFT JOIN
+(SELECT
+  jj.买家地址,
+  jj.省,
+  jj.市,
+  jj.区,
+  MID(jj.买家地址,(CHAR_LENGTH(jj.省)+CHAR_LENGTH(jj.市)+CHAR_LENGTH(jj.区)+1),(LENGTH(jj.买家地址)-(LENGTH(jj.省)+LENGTH(jj.市)+LENGTH(jj.区))))AS order_add,
+  jj.`订单编号`AS order_id
+FROM
+ jd_shop jj
+ORDER BY
+order_add DESC)kk
+ON tt.order_id=kk.order_id;
+
+
+#4、待分析订单构成
+USE temp_data_process;
+DROP TABLE 
+IF EXISTS jd_order;
+CREATE TABLE jd_order AS
+SELECT
+  CONCAT(MONTH(jj.`订货日期`),'月') AS date_month,
+  DAYOFMONTH(jj.`订货日期`) AS month_day,
+  jj.`订货日期` AS order_time,
+  jj.`买家ID` AS user_id,
+  jj.`订单编号` AS order_id,
+  ROUND(jj.`订单总金额`,1) AS order_fee,
+  ROUND(jj.总件数,0) AS order_skus
+FROM
+ jd_shop jj
+WHERE
+ jj.`订货日期` IS NOT NULL;
