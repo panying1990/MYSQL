@@ -180,3 +180,29 @@ for(i in 1:nrow(kd_brushadd_outcome))
 {
   if(as.numeric(kd_brushadd_outcome$add_buy_cunt.x[i])==as.numeric(kd_brushadd_outcome$add_buy_cunt.y[i])) kd_brushadd_outcome$brusher_tag[i]<-'norm' else kd_brushadd_outcome$brusher_tag[i]<-'brusher'
 }
+
+#获得疑似刷单用户全部信息
+add_brushertag<-data.frame(kd_brushadd_outcome$buyer_id[kd_brushadd_outcome$brusher_tag=='brusher'])
+add_brushertag$brusher_tag<-rep('brusher',nrow(add_brushertag))
+names(add_brushertag)[1]<-'buyer_id'
+kd_brushadd_brusher<-dplyr::left_join(kd_trade_brushadd,add_brushertag,by="buyer_id")
+
+#筛出疑似刷单的订单并进行判定
+kd_brushadd_suspected<-filter(kd_brushadd_brusher,brusher_tag=='brusher',order_payamout>137)
+kd_brushadd_suspected$order_fee<-round(kd_brushadd_suspected$order_payamout,0)
+
+y_addprice<-seq(0,round(max(kd_brushadd_suspected$order_fee/100,0))*100,length.out=6)
+#同一买家ID号短时间多次购买行为-数据可视化
+ggplot(kd_brushadd_suspected,aes(x=month_day,y=order_payamout,group=date_month))+
+  geom_point(colour="red",size=1)+
+  facet_wrap(~date_month)+
+  scale_x_continuous(breaks = x_day,label = x_day)+
+  scale_y_continuous(breaks = y_addprice,label = y_price)+
+  labs(title="假设3：相同地址多ID疑似刷单订单分布情况",subtitle="---根据月份进行分类",x="订单下单日期(日)",y="疑似刷单订单价格")+
+  mytheme2
+
+
+#将数据写入到目标数据库方便之后做进一步整合
+dbListTables(conn)  
+dbWriteTable(conn,"brusher_tag03",kd_brushadd_suspected)  
+dbListTables(conn)
