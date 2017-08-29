@@ -4,8 +4,25 @@
 -- 1：监控目前有多少用户打了标签；
 -- 2：监控100个自定标签的打标情况。
 
--- 所以 1：监控目前有多少用户打了标签；该部分数据可以作为视图，作为日常监控窗口：
--- 自定义用户标签数据查询
+-- 所以 1：监控目前有多少用户打了标签；自定义属性有100条，
+START TRANSACTION;
+
+USE tag_explore;
+
+DROP TABLE
+IF EXISTS customerLabelMonitor;
+
+CREATE TABLE customerLabelMonitor AS 
+SELECT
+tt.develop_year,
+tt.develop_month,
+tr.tag_name,
+tt.user_tag,
+tt.tag_attributes,
+tt.customer_id_counts,
+tl.diff_day_counts
+FROM
+(-- 自定义用户标签监控，共50个
 SELECT
  tt.develop_year,
  tt.develop_month,
@@ -1040,4 +1057,28 @@ ORDER BY
  develop_year,
  develop_month,
  user_tag,
- tag_attributes))tt;
+ tag_attributes))tt
+WHERE
+ tt.tag_attributes IS NOT NULL 
+AND LENGTH(tt.tag_attributes)>0)tt
+LEFT JOIN
+(SELECT
+	YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+	COUNT(DISTINCT tt.sys_customer_id) AS diff_day_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+	develop_year,
+	develop_month
+ORDER BY
+	develop_year,
+	develop_month)tl
+ON CONCAT(tt.develop_year,tt.develop_month)=CONCAT(tl.develop_year,tl.develop_month)
+LEFT JOIN (SELECT tt.`code` AS tag_code, tt.`name` AS tag_name FROM crm_kd.kd_customer_property tt)tr
+ON tt.user_tag=tr.tag_code
+ORDER BY
+tt.develop_year,
+tt.develop_month;
