@@ -1,0 +1,1043 @@
+-- 本部分数据查询语句用于用户标签自定义部分
+-- 关键表来源：kd_customer_property，自定义标签登记表：kd_customer_property_value
+-- 从数据来源看，两张表可以做两件事情：
+-- 1：监控目前有多少用户打了标签；
+-- 2：监控100个自定标签的打标情况。
+
+-- 所以 1：监控目前有多少用户打了标签；该部分数据可以作为视图，作为日常监控窗口：
+-- 自定义用户标签数据查询
+SELECT
+ tt.develop_year,
+ tt.develop_month,
+ tt.user_tag,
+ tt.tag_attributes,
+ tt.customer_id_counts
+FROM
+((SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo2") AS user_tag,
+  tt.ueInfo2 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo3") AS user_tag,
+  tt.ueInfo3 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo4") AS user_tag,
+  tt.ueInfo4 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo5") AS user_tag,
+  tt.ueInfo5 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo6") AS user_tag,
+  tt.ueInfo6 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo7") AS user_tag,
+  tt.ueInfo7 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo8") AS user_tag,
+  tt.ueInfo8 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo9") AS user_tag,
+  tt.ueInfo9 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo10") AS user_tag,
+  tt.ueInfo10 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo11") AS user_tag,
+  tt.ueInfo11 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo12") AS user_tag,
+  tt.ueInfo12 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo13") AS user_tag,
+  tt.ueInfo13 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo14") AS user_tag,
+  tt.ueInfo14 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo15") AS user_tag,
+  tt.ueInfo15 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo16") AS user_tag,
+  tt.ueInfo16 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo17") AS user_tag,
+  tt.ueInfo17 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo18") AS user_tag,
+  tt.ueInfo18 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo19") AS user_tag,
+  tt.ueInfo19 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo20") AS user_tag,
+  tt.ueInfo20 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo21") AS user_tag,
+  tt.ueInfo21 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo22") AS user_tag,
+  tt.ueInfo22 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo23") AS user_tag,
+  tt.ueInfo23 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo24") AS user_tag,
+  tt.ueInfo24 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo25") AS user_tag,
+  tt.ueInfo25 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo26") AS user_tag,
+  tt.ueInfo26 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo27") AS user_tag,
+  tt.ueInfo27 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo28") AS user_tag,
+  tt.ueInfo28 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo29") AS user_tag,
+  tt.ueInfo29 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo30") AS user_tag,
+  tt.ueInfo30 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo31") AS user_tag,
+  tt.ueInfo31 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo32") AS user_tag,
+  tt.ueInfo32 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo33") AS user_tag,
+  tt.ueInfo33 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo34") AS user_tag,
+  tt.ueInfo34 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo35") AS user_tag,
+  tt.ueInfo35 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo36") AS user_tag,
+  tt.ueInfo36 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo37") AS user_tag,
+  tt.ueInfo37 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo38") AS user_tag,
+  tt.ueInfo38 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo39") AS user_tag,
+  tt.ueInfo39 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo40") AS user_tag,
+  tt.ueInfo40 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo41") AS user_tag,
+  tt.ueInfo41 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo42") AS user_tag,
+  tt.ueInfo42 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo43") AS user_tag,
+  tt.ueInfo43 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo44") AS user_tag,
+  tt.ueInfo44 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo45") AS user_tag,
+  tt.ueInfo45 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo46") AS user_tag,
+  tt.ueInfo46 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo47") AS user_tag,
+  tt.ueInfo47 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo48") AS user_tag,
+  tt.ueInfo48 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo49") AS user_tag,
+  tt.ueInfo49 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION
+(SELECT
+  YEAR(tl.develop_time) AS develop_year,
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("ueInfo50") AS user_tag,
+  tt.ueInfo50 AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+	crm_kd.kd_customer_property_value tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes))tt;
