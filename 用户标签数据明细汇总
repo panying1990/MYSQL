@@ -1,0 +1,46 @@
+-- 汇总来自三个不同表缘的用户标签情况
+SELECT
+tt.tag_from,
+tt.user_tag,
+tt.tag_attributes,
+SUM(tt.customer_id_counts) AS customer_id_cntsum
+FROM
+(-- kd_customer
+(SELECT
+ CONCAT('kd_customer') AS tag_from,
+ tt.develop_year,
+ tt.develop_month,
+ tt.user_tag,
+ tt.tag_attributes,
+ tt.customer_id_counts
+FROM
+ tag_explore.basementLabelMonitor tt)
+UNION -- kd_customer_ext
+(SELECT
+ CONCAT('kd_customer_ext') AS tag_from,
+ tt.develop_year,
+ tt.develop_month,
+ tt.user_tag,
+ tt.tag_attributes,
+ tt.customer_id_counts
+FROM
+ tag_explore.baseplusLabelMonitor tt)
+UNION
+(SELECT
+ CONCAT('kd_customer_property_value') AS tag_from,
+ tt.develop_year,
+ tt.develop_month,
+ tt.user_tag,
+ tt.tag_attributes,
+ tt.customer_id_counts
+FROM
+ tag_explore.customerLabelMonitor tt)
+)tt
+GROUP BY
+tt.tag_from,
+tt.user_tag,
+tt.tag_attributes
+ORDER BY
+tt.tag_from,
+tt.user_tag,
+tt.tag_attributes;
