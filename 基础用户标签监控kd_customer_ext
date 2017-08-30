@@ -1,0 +1,420 @@
+-- 基础用户标签plus监控，共65个
+-- 用于来自kd_customer的主体用户数据部分
+-- 关键表来源：kd_customer，自定义标签登记表：subdivisioncondition
+-- 从数据来源看，两张表可以做两件事情：
+-- 1：监控目前有多少用户打了标签；
+-- 2：监控100个自定标签的打标情况。
+
+-- 所以 1：监控目前有基础标签的基本情况，
+-- START TRANSACTION;
+
+-- USE tag_explore;
+
+-- DROP TABLE
+-- IF EXISTS baseplusLabelMonitor;
+
+-- CREATE TABLE baseplusLabelMonitor AS 
+ SELECT
+ tt.develop_year,
+ tt.develop_month,
+ tt.user_tag,
+ tt.tag_attributes,
+ tt.customer_id_counts
+ FROM((SELECT -- 互动次数
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("interact_times") AS user_tag,
+  ROUND(tt.interact_times,0) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 首次获得积分时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("first_get_integral_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.first_get_integral_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 最后催付时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("last_urge_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.last_urge_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 最后付款关怀时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("last_pay_concern_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.last_pay_concern_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 最后发货提醒时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("last_ship_remind_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.last_ship_remind_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 最后到达提醒时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("last_arrival_reminder_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.last_arrival_reminder_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 最后签收关怀时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("last_receive_concern_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.last_receive_concern_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 最后确认关怀时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("last_confirm_concern_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.last_confirm_concern_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 最后退款关怀时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("last_refund_concern_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.last_refund_concern_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 最后升级关怀时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("last_memberup_time") AS user_tag,
+ (CASE WHEN ISNULL(tt.last_memberup_time) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 是否激活
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("is_actived") AS user_tag,
+ ROUND(tt.is_actived,0) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 激活方式
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("actived_type") AS user_tag,
+  ROUND(tt.actived_type,0) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 激活时间
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("actived_at") AS user_tag,
+ (CASE WHEN ISNULL(tt.actived_at) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 用户来源
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("source") AS user_tag,
+  ROUND(tt.source,0) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 用户来源分类
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("group_id") AS user_tag,
+  ROUND(tt.group_id,0) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- QQ
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("QQ") AS user_tag,
+  (CASE WHEN ISNULL(tt.qq) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- MSN
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("msn") AS user_tag,
+  (CASE WHEN ISNULL(tt.msn) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 结婚日期
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("marry_date") AS user_tag,
+  (CASE WHEN ISNULL(tt.marry_date) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
+UNION -- 会员卡
+(SELECT 
+  YEAR(tl.develop_time) AS develop_year, 
+  MONTH(tl.develop_time) AS develop_month,
+  CONCAT("member_card") AS user_tag,
+  (CASE WHEN ISNULL(tt.member_card) THEN 0 ELSE 1 END ) AS tag_attributes,
+	COUNT(DISTINCT tt.sys_customer_id) AS customer_id_counts
+FROM
+  crm_kd.kd_customer_ext tt
+LEFT JOIN crm_kd.kd_customer tl
+ON tt.sys_customer_id=tl.sys_customer_id
+GROUP BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes
+ORDER BY
+ develop_year,
+ develop_month,
+ user_tag,
+ tag_attributes)
