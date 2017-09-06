@@ -20,9 +20,45 @@ tt.develop_month,
 tt.user_tag,
 tt.tag_attributes,
 tt.customer_id_counts
-FROM
-(
- -- 性别
+FROM(
+(SELECT  -- 手机号
+		YEAR (tl.develop_time) AS develop_year,
+		MONTH (tl.develop_time) AS develop_month,
+		CONCAT("mobile") AS user_tag,
+   (CASE WHEN ISNULL(tl.mobile) THEN 0 ELSE 1 END ) AS tag_attributes,
+		COUNT(DISTINCT tl.sys_customer_id) AS customer_id_counts
+	FROM
+		crm_kd.kd_customer tl
+	GROUP BY
+		develop_year,
+		develop_month,
+		user_tag,
+		tag_attributes
+	ORDER BY
+		develop_year,
+		develop_month,
+		user_tag,
+		tag_attributes)
+UNION-- 邮件
+(SELECT  
+		YEAR (tl.develop_time) AS develop_year,
+		MONTH (tl.develop_time) AS develop_month,
+		CONCAT("email") AS user_tag,
+   (CASE WHEN ISNULL(tl.email) THEN 0 ELSE 1 END ) AS tag_attributes,
+		COUNT(DISTINCT tl.sys_customer_id) AS customer_id_counts
+	FROM
+		crm_kd.kd_customer tl
+	GROUP BY
+		develop_year,
+		develop_month,
+		user_tag,
+		tag_attributes
+	ORDER BY
+		develop_year,
+		develop_month,
+		user_tag,
+		tag_attributes)
+UNION -- 性别
 (SELECT  
 		YEAR (tl.develop_time) AS develop_year,
 		MONTH (tl.develop_time) AS develop_month,
@@ -692,7 +728,7 @@ UNION -- 客户来源
 		YEAR (tl.develop_time) AS develop_year,
 		MONTH (tl.develop_time) AS develop_month,
 		CONCAT("cus_from") AS user_tag,
-		(CASE WHEN tl.cus_from>0 THEN 0 ELSE 1 END)AS tag_attributes,
+		(CASE WHEN tl.cus_from IN(0,1) THEN 1 ELSE 0 END) AS tag_attributes,
 		COUNT(DISTINCT tl.sys_customer_id) AS customer_id_counts
 	FROM
 		crm_kd.kd_customer tl
@@ -711,18 +747,18 @@ UNION -- 平台来源类型
 		YEAR (tl.develop_time) AS develop_year,
 		MONTH (tl.develop_time) AS develop_month,
 		CONCAT("plat_from_type") AS user_tag,
-		(CASE WHEN tl.plat_from_type>0 THEN 0 ELSE 1 END) AS tag_attributes,
+		(CASE WHEN ISNULL(tl.plat_from_type) THEN 0 ELSE 1 END) AS tag_attributes,
 		COUNT(DISTINCT tl.sys_customer_id) AS customer_id_counts
 	FROM
 		crm_kd.kd_customer tl
 	GROUP BY
-		develop_year,
+	  develop_year,
 		develop_month,
 		user_tag,
 		tag_attributes
 	ORDER BY
-		develop_year,
-		develop_month,
+		-- develop_year,
+		-- develop_month,
 		user_tag,
 		tag_attributes)
 UNION -- 黑名单设置时间
