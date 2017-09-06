@@ -27,7 +27,7 @@ FROM
 		YEAR (tl.develop_time) AS develop_year,
 		MONTH (tl.develop_time) AS develop_month,
 		CONCAT("sex") AS user_tag,
-		(CASE WHEN tl.sex>0 THEN 0 ELSE 1 END)AS tag_attributes,
+		(CASE WHEN tl.sex IN(0,1) THEN 1 ELSE 0 END) AS tag_attributes,
 		COUNT(DISTINCT tl.sys_customer_id) AS customer_id_counts
 	FROM
 		crm_kd.kd_customer tl
