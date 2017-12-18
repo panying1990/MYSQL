@@ -1,0 +1,165 @@
+-- 计算值
+USE data_check;
+SET @start_citytime = "2016-01-01"; -- 分析开始时间
+SET @end_citytime = "2017-11-30"; -- 分析结束时间
+SET @seller_momery = "1药网用户";
+DROP TABLE 
+IF EXISTS trade_data_topten;
+CREATE TABLE trade_data_topten AS
+SELECT
+ tt.*
+FROM
+ crm_kd.kd_trade tt
+WHERE
+ sys_customer_id IN
+(SELECT
+ tt.sys_customer_id
+FROM
+ crm_kd.kd_customer tt
+WHERE
+ DATE_FORMAT(tt.last_order_time,"%Y-%m-%d") BETWEEN @start_citytime AND @end_citytime -- 从2016年01月01日到2017年·10月15日的用户数据
+AND
+ sys_customer_id NOT IN(SELECT tt.sys_customer_id FROM crm_kd.kd_customer tt WHERE tt.pay_amount<20 AND tt.pay_times>0) -- 排除非主力客户
+AND
+ sys_customer_id NOT IN(SELECT tt.sys_customer_id FROM data_check.unnorm_customer_id tt) -- 排除部分囤货用户
+AND
+ tt.plat_from_type <> 40 -- 排除来自呼叫中心的用户
+ORDER BY
+ tt.develop_time DESC)
+AND
+ DATE_FORMAT(tt.pay_time,"%Y-%m-%d") BETWEEN @start_citytime AND @end_citytime
+AND
+ tt.plat_from_id=585
+AND
+ tt.trade_status IN('TRADE_FINISHED','TRADE_BUYER_SIGNED','WAIT_BUYER_CONFIRM_GOODS','WAIT_BUYER_PAY','WAIT_SELLER_SEND_GOODS') -- 将进行同比分析的数据锁定在天猫旗舰店中，如此，确保前后数据的一致性
+AND
+ tt.seller_memo <> "1药网用户"
+AND
+ tt.seller_memo <> "碧生源药品旗舰店用户";
+
+USE tag_text;
+SET @city_num=0;
+DROP TABLE 
+IF EXISTS 电商临时需求会员营销;
+CREATE TABLE 电商临时需求会员营销 AS
+SELECT
+ @city_num:=@city_num+1 AS city_index,
+ zz.province as std_province,
+ zz.city AS std_city,
+ pp.province_amount AS amount_yoy,
+ tt.province_amount AS amount,
+ pp.province_counts AS counts_yoy,
+ tt.province_counts AS counts,
+ -- ROUND(zz.population,1) AS population,
+ -- ROUND(10*tt.province_counts/zz.population,1) AS user_per_wan,
+ pp.user_paytimes AS user_paytimes_yoy,
+ tt.user_paytimes AS user_paytimes,
+ ROUND(pp.province_amount/pp.user_paytimes) AS price_yoy,
+ ROUND(tt.province_amount/tt.user_paytimes) AS price
+ -- ROUND(pp.user_paytimes/pp.province_counts,3) AS buynum_yoy,
+ -- ROUND(tt.user_paytimes/tt.province_counts,3) AS buynum,
+ -- ROUND(100*(tt.province_amount/pp.province_amount-1),1) AS amounts_ratio,
+ -- ROUND(100*(tt.province_counts/pp.province_counts-1),1) AS counts_ratio,
+ -- ROUND(100*(tt.user_paytimes/pp.user_paytimes-1),1) AS paytimes_ratio,
+ -- ROUND((ROUND(tt.province_amount/tt.user_paytimes)-ROUND(pp.province_amount/pp.user_paytimes)),1) AS price_gap,
+ -- ROUND((ROUND(tt.user_paytimes/tt.province_counts,3)-ROUND(pp.user_paytimes/pp.province_counts,3)),3) AS buyerper_gap
+FROM
+(SELECT
+ tt.pay_year,
+ tt.province,
+ tt.city,
+ SUM(tt.province_amount) AS province_amount,
+ SUM(tt.user_counts) AS province_counts,
+ SUM(tt.user_paytimes) AS user_paytimes
+FROM
+(SELECT
+ DATE_FORMAT(tt.created,"%Y") AS pay_year,
+ TRIM(LEFT(tt.receiver_province,2)) AS province,
+ TRIM(LEFT(tt.receiver_city,2)) AS city,
+ ROUND(SUM(tt.payment),1) AS province_amount,
+ COUNT(DISTINCT tt.sys_customer_id) AS user_counts,
+ COUNT(tt.sys_trade_id) AS user_paytimes
+FROM
+ data_check.trade_data_topten tt
+GROUP BY
+ pay_year,
+ province,
+ city
+HAVING
+ pay_year=2017
+ORDER BY
+ province,
+ user_counts DESC) tt
+GROUP BY
+ tt.pay_year,
+ tt.province,
+ tt.city)tt
+LEFT JOIN
+(SELECT
+ tt.pay_year,
+ tt.province,
+ tt.city,
+ SUM(tt.province_amount) AS province_amount,
+ SUM(tt.user_counts) AS province_counts,
+ SUM(tt.user_paytimes) AS user_paytimes
+FROM
+(SELECT
+ DATE_FORMAT(tt.created,"%Y") AS pay_year,
+ TRIM(LEFT(tt.receiver_province,2)) AS province,
+ TRIM(LEFT(tt.receiver_city,2)) AS city,
+ ROUND(SUM(tt.payment),1) AS province_amount,
+ COUNT(DISTINCT tt.sys_customer_id) AS user_counts,
+ COUNT(tt.sys_trade_id) AS user_paytimes
+FROM
+ data_check.trade_data_topten tt
+GROUP BY
+ pay_year,
+ province,
+ city
+HAVING
+ pay_year=2016
+ORDER BY
+ province,
+ user_counts DESC) tt
+GROUP BY
+ tt.pay_year,
+ tt.province,
+ tt.city)pp
+ON CONCAT(LEFT(TRIM(tt.province),2),left(tt.city,2))=CONCAT(LEFT(TRIM(pp.province),2),left(pp.city,2))
+LEFT JOIN data_check.top_city zz
+ON CONCAT(LEFT(tt.province,2),left(tt.city,2))=CONCAT(LEFT(zz.province,2),left(zz.city,2))
+WHERE
+zz.province IS NOT NULL
+AND
+tt.province_counts>50
+ORDER BY
+std_province;
+
+
+USE tag_text;
+DROP TABLE 
+IF EXISTS 电商临时需求会员信息;
+CREATE TABLE 电商临时需求会员信息 AS
+SELECT
+ tt.sys_customer_id,
+ tt.out_nick AS 客户id,
+ tt.receiver_province AS 省,
+ tt.receiver_city AS 市,
+ ROUND(sum(tt.payment),2) AS 支付总金额,
+ COUNT(DISTINCT tt.sys_trade_id) AS 支付次数,
+ MIN(tt.pay_time) AS 首次付款时间,
+ MAX(tt.pay_time) AS 最后一次付款时间,
+ ROUND(SUM(tt.num),1) AS 付款件数,
+ ROUND(SUM(tt.payment)/COUNT(DISTINCT tt.sys_trade_id),1) AS 平均客单价
+FROM
+ data_check.trade_data_topten tt
+LEFT JOIN
+ crm_kd.kd_customer zz
+ON tt.sys_customer_id =zz.sys_customer_id
+GROUP BY
+tt.sys_customer_id,
+客户id,
+省,
+市
+ORDER BY
+ 最后一次付款时间 DESC;
