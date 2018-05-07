@@ -1,0 +1,90 @@
+-- 电商产品组需要对新上架产品代餐饼干重合销售人群的情况进行分析跟踪
+-- 数据维度： 月度、日度
+-- 取数周期：建议取数为周度，统计取数时间后2日10点
+-- 数据相关维度及定义
+
+ /*
+1、时间维度：用两个方向来约束
+   1).2017年01月01日以来
+   2).2018年04月19日之后代餐饼干数据
+2、数据渠道：
+   1).碧生源官方旗舰店   
+3、数据定义：
+   1)、代餐饼干消费客户:有过代餐饼干下单行为的客户数
+   2)、重合人群消费：分为两类，但本分析主要分析一类即购买商品前项为非代餐饼干产品
+4、产品分类：
+   当前代餐饼干产品在天猫官方旗舰店销售共三款，一盒、三盒、五盒、分别通过outer_id与outer_item_id进行识别
+ */
+SET @yearmonth=NOW();
+SET @productitems=['2020416','2020417','6955694580076']
+
+SELECT
+ tt.outer_id,
+ tt.out_item_id,
+ tt.title
+FROM
+(SELECT
+ tt.outer_id,
+ tt.out_item_id,
+ tt.title
+FROM
+ crm_kd.kd_order tt
+WHERE
+ tt.title REGEXP '饼干'
+AND
+ DATE_FORMAT(tt.create_time,"%Y-%m-%d") BETWEEN "2017-01-01" AND DATE_FORMAT(@yearmonth,"%Y-%m-%d"))tt
+GROUP BY
+ tt.outer_id,
+ tt.out_item_id,
+ tt.title;
+
+/*查询产品为代餐饼干的人群*/
+DROP TABLE
+IF EXISTS pincha_pinggan;
+CREATE TABLE pincha_pinggan AS
+SELECT
+ tt.sys_trade_id,
+ tt.out_item_id,
+ tt.out_order_id,
+ tt.title,
+ tt.number,
+ tt.price,
+ tt.sys_customer_id,
+ cc.payment,
+ cc.pay_time,
+ cc.created,
+ cc.receiver_province,
+ cc.receiver_city
+FROM
+ crm_kd.kd_order tt
+LEFT JOIN
+(SELECT
+ tt.sys_trade_id,
+ cc.sys_customer_id,
+ tt.payment,
+ tt.pay_time,
+ tt.created,
+ tt.receiver_province,
+ tt.receiver_city
+FROM
+ crm_kd.kd_trade tt
+LEFT JOIN
+(SELECT
+ tt.sys_customer_id
+FROM
+ crm_kd.kd_order tt
+WHERE
+ tt.title REGEXP '饼干'
+AND
+ DATE_FORMAT(tt.create_time,"%Y-%m-%d") BETWEEN "2018-04-18" AND DATE_FORMAT(@yearmonth,"%Y-%m-%d")
+GROUP BY
+tt.sys_customer_id) cc
+ON tt.sys_customer_id = cc.sys_customer_id
+WHERE
+DATE_FORMAT(tt.created,"%Y-%m-%d") BETWEEN "2017-01-01" AND DATE_FORMAT(@yearmonth,"%Y-%m-%d")
+AND
+cc.sys_customer_id IS NOT NULL)cc
+ON
+ tt.sys_trade_id = cc.sys_trade_id
+WHERE
+ cc.sys_trade_id IS NOT NULL;
