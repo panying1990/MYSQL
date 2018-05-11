@@ -16,14 +16,19 @@
    当前代餐饼干产品在天猫官方旗舰店销售共三款，一盒、三盒、五盒、分别通过outer_id与outer_item_id进行识别
  */
 SET @yearmonth=NOW();
-SET @productitems=['2020416','2020417','6955694580076']
+SET @productitems=['2020416','2020417','6955694580076'];
+
+SELECT
+@yearmonth;
 
 SELECT
  tt.outer_id,
  tt.out_item_id,
  tt.title
 FROM
-(SELECT
+FROM
+(
+ SELECT
  tt.outer_id,
  tt.out_item_id,
  tt.title
@@ -88,3 +93,69 @@ ON
  tt.sys_trade_id = cc.sys_trade_id
 WHERE
  cc.sys_trade_id IS NOT NULL;
+
+/*用于分析重合用户的构成*/
+SELECT
+ tt.`产品类型`,
+ COUNT(DISTINCT tt.sys_customer_id) AS 用户数
+FROM
+ crm_kd.pincha_pingganp tt
+GROUP BY
+ tt.`产品类型`
+ORDER BY
+ 用户数 DESC;
+
+/*将产品名称进行标准化->获得transaction数据*/
+DROP TABLE
+IF EXISTS pincha_transaction;
+CREATE TABLE pincha_transaction AS
+SELECT
+ CASE WHEN tt.title REGEXP '饼干' THEN  '饼干'
+      WHEN tt.title REGEXP '减肥茶' THEN  '减肥茶' 
+      WHEN tt.title REGEXP '代餐奶昔' THEN  '代餐奶昔'
+      WHEN tt.title REGEXP '常菁茶' THEN  '常菁茶'
+      WHEN tt.title REGEXP '左旋肉碱' THEN  '左旋肉碱'
+      WHEN tt.title REGEXP '常润茶' THEN  '常润茶'
+      WHEN tt.title REGEXP '纤纤茶' THEN  '纤纤茶'
+      WHEN tt.title REGEXP '花果茶' THEN  '花果茶'
+      WHEN tt.title REGEXP '红糖姜茶' THEN  '红糖姜茶'
+      WHEN tt.title REGEXP '维生素C咀嚼片' THEN  '维生素C咀嚼片'
+      WHEN tt.title REGEXP '奥利司他' THEN  '奥利司他'
+      WHEN tt.title REGEXP '酵素' THEN  '酵素'
+      WHEN tt.title REGEXP '天然维生素E软胶囊' THEN  '天然维生素E软胶囊'
+      WHEN tt.title REGEXP '益生菌' THEN  '益生菌'
+      WHEN tt.title REGEXP '清柠姜茶' THEN  '清柠姜茶'
+      ELSE '赠品' END AS item_sku,
+ tt.sys_trade_id
+FROM
+crm_kd.pincha_pinggan tt 
+
+
+DROP TABLE
+IF EXISTS pincha_transaction2;
+CREATE TABLE pincha_transaction2 AS
+SELECT
+ tt.sys_trade_id,
+ CASE WHEN tt.title REGEXP '饼干' THEN  1 ELSE 0 END AS 饼干,
+ CASE WHEN tt.title REGEXP '减肥茶' THEN  1 ELSE 0 END AS  减肥茶,
+ CASE WHEN tt.title REGEXP '代餐奶昔' THEN  1 ELSE 0 END AS 代餐奶昔,
+ CASE WHEN tt.title REGEXP '常菁茶' THEN  1 ELSE 0 END AS 常菁茶,
+ CASE WHEN tt.title REGEXP '左旋肉碱' THEN  1 ELSE 0 END AS 左旋肉碱,
+ CASE WHEN tt.title REGEXP '常润茶' THEN  1 ELSE 0 END AS 常润茶,
+ CASE WHEN tt.title REGEXP '纤纤茶' THEN  1 ELSE 0 END AS 纤纤茶,
+ CASE WHEN tt.title REGEXP '花果茶' THEN  1 ELSE 0 END AS 花果茶,
+ CASE WHEN tt.title REGEXP '红糖姜茶' THEN  1 ELSE 0 END AS 红糖姜茶,
+ CASE WHEN tt.title REGEXP '维生素C咀嚼片' THEN  1 ELSE 0 END AS 维生素C咀嚼片,
+ CASE WHEN tt.title REGEXP '奥利司他' THEN  1 ELSE 0 END AS 奥利司他,
+ CASE WHEN tt.title REGEXP '酵素' THEN  1 ELSE 0 END AS 酵素,
+ CASE WHEN tt.title REGEXP '天然维生素E软胶囊' THEN  1 ELSE 0 END AS 天然维生素E软胶囊,
+ CASE WHEN tt.title REGEXP '益生菌' THEN  1 ELSE 0 END AS 益生菌,
+ CASE WHEN tt.title REGEXP '清柠姜茶' THEN  1 ELSE 0 END AS 清柠姜茶
+FROM
+crm_kd.pincha_pinggan tt
+GROUP BY
+ tt.sys_trade_id
+HAVING
+ 饼干+减肥茶+代餐奶昔+常菁茶+左旋肉碱+常润茶+纤纤茶+花果茶+红糖姜茶+维生素C咀嚼片+奥利司他+酵素+天然维生素E软胶囊+益生菌+清柠姜茶>0
+
+
