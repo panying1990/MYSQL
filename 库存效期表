@@ -8,6 +8,14 @@ DROP TABLE
 IF EXISTS 库存效期初始表;
 CREATE TABLE 库存效期初始表 AS
 SELECT
+ tt.*,
+ CASE WHEN tt.生产效期<0 THEN "过期品" 
+      WHEN tt.生产效期 BETWEEN 0 AND 6 THEN "0-6个月"
+      WHEN tt.生产效期 BETWEEN 7 AND 9 THEN "7-9个月"  
+      WHEN tt.生产效期 BETWEEN 10 AND 12 THEN "10-12个月"   
+      ELSE "13个月及以上" END AS 产品效期 
+FROM
+(SELECT
  tt.`客户名称`,
  tt.`客户编号`,
  tt.客户类型,
@@ -26,15 +34,17 @@ SELECT
      WHEN tt.`产品标准名`="常菁茶" THEN ROUND(20-ABS(ROUND(DATEDIFF(tt.生产日期,@last_date)/30,0)),0)
      WHEN tt.`产品标准名`="纤纤茶" THEN ROUND(24-ABS(ROUND(DATEDIFF(tt.生产日期,@last_date)/30,0)),0)  
      WHEN tt.`产品标准名`="开塞露" THEN ROUND(36-ABS(ROUND(DATEDIFF(tt.生产日期,@last_date)/30,0)),0)  
-     WHEN tt.`产品标准名`="奥利司他" THEN ROUND(36-ABS(ROUND(DATEDIFF(tt.生产日期,@last_date)/30,0)),0)  
+     WHEN tt.`产品标准名`="来利奥利司他" THEN ROUND(36-ABS(ROUND(DATEDIFF(tt.生产日期,@last_date)/30,0)),0)  
      ELSE NULL END AS 生产效期,
  tt.`库存编号`,
  tt.`库存类型`,
  tt.`库存日期`,
  tt.`产品单位`,
  tt.`产品销量`,
- tt.`产品价格`,
- tt.`产品金额`
+--  tt.`产品价格`,
+--  tt.`产品金额`
+ zz.`标准价`,
+ tt.`产品销量`*zz.`标准价`AS 产品金额
 FROM
 (SELECT
  tt.`客户名称`,
@@ -54,18 +64,18 @@ CASE WHEN tt.`产品标准名`="常润茶" THEN DATE_FORMAT(CONCAT(MID(tt.`产�
      WHEN tt.`产品标准名`="常菁茶" THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d") 
      WHEN tt.`产品标准名`="纤纤茶" THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,3,2),"-",MID(tt.`产品批号`,5,2),"-01"),"%Y-%m-%d") 
      WHEN tt.`产品标准名`="开塞露" THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,1,2),"-",MID(tt.`产品批号`,3,2),"-01"),"%Y-%m-%d") 
-     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,2)=21 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d")
-     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,2)=11 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d")
-     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,2)=20 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,3,2),"-",MID(tt.`产品批号`,5,2),"-01"),"%Y-%m-%d") 
-     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,2)=15 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,1,2),"-",MID(tt.`产品批号`,3,2),"-01"),"%Y-%m-%d")
+     WHEN tt.`产品标准名`="来利奥利司他" AND LEFT(tt.`产品批号`,2)=21 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d")
+     WHEN tt.`产品标准名`="来利奥利司他" AND LEFT(tt.`产品批号`,2)=11 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d")
+     WHEN tt.`产品标准名`="来利奥利司他" AND LEFT(tt.`产品批号`,2)=20 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,3,2),"-",MID(tt.`产品批号`,5,2),"-01"),"%Y-%m-%d") 
+     WHEN tt.`产品标准名`="来利奥利司他" AND LEFT(tt.`产品批号`,2)=15 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,1,2),"-",MID(tt.`产品批号`,3,2),"-01"),"%Y-%m-%d")
      ELSE NULL END AS 生产日期,
  tt.`库存编号`,
  tt.`库存类型`,
  tt.`库存日期`,
  tt.`产品单位`,
- tt.`产品销量`,
- tt.`产品价格`,
- tt.`产品金额`
+ tt.`产品销量`
+--  tt.`产品价格`,
+--  tt.`产品金额`
 FROM
 ( 
 SELECT
@@ -83,8 +93,8 @@ SELECT
 --  tt.prod_batch AS 产品批号,
  tt.prod_unit AS 产品单位,
  tt.prod_count AS 产品销量,
- tt.prod_price AS 产品价格,
- tt.prod_money AS 产品金额,
+--  tt.prod_price AS 产品价格,
+--  tt.prod_money AS 产品金额,
  jj.产品标准名,
  jj.`产品标准规格`
 FROM
@@ -121,11 +131,14 @@ FROM
 GROUP BY
  tt.`省份`)t1
 ON tt.`客户所在省`=t1.省份
+LEFT JOIN
+ agilesc_report.`产品价格表` zz
+ON
+ CONCAT(tt.`产品标准名`,tt.`产品标准规格`)=CONCAT(zz.产品名称,zz.产品标准规格)
 WHERE
  tt.产品标准名 IS NOT NULL
 ORDER BY
  tt.`产品标准名`,
  tt.`客户名称`,
- tt.产品批号 DESC;
-
+ tt.产品批号 DESC)tt;
 
