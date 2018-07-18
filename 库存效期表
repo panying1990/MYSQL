@@ -12,6 +12,9 @@ SELECT
  tt.`客户编号`,
  tt.客户类型,
  tt.`客户所在省`,
+ t1.省会城市,
+ t1.省会经度,
+ t1.省会纬度,
  tt.`客户所在城市`,
  tt.`产品名`,
  tt.`产品规格`,
@@ -51,8 +54,10 @@ CASE WHEN tt.`产品标准名`="常润茶" THEN DATE_FORMAT(CONCAT(MID(tt.`产�
      WHEN tt.`产品标准名`="常菁茶" THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d") 
      WHEN tt.`产品标准名`="纤纤茶" THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,3,2),"-",MID(tt.`产品批号`,5,2),"-01"),"%Y-%m-%d") 
      WHEN tt.`产品标准名`="开塞露" THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,1,2),"-",MID(tt.`产品批号`,3,2),"-01"),"%Y-%m-%d") 
-     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,1)=2 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d") 
-     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,1)=1 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,1,2),"-",MID(tt.`产品批号`,3,2),"-01"),"%Y-%m-%d")
+     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,2)=21 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d")
+     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,2)=11 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,2,2),"-",MID(tt.`产品批号`,4,2),"-01"),"%Y-%m-%d")
+     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,2)=20 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,3,2),"-",MID(tt.`产品批号`,5,2),"-01"),"%Y-%m-%d") 
+     WHEN tt.`产品标准名`="奥利司他" AND LEFT(tt.`产品批号`,2)=15 THEN DATE_FORMAT(CONCAT(MID(tt.`产品批号`,1,2),"-",MID(tt.`产品批号`,3,2),"-01"),"%Y-%m-%d")
      ELSE NULL END AS 生产日期,
  tt.`库存编号`,
  tt.`库存类型`,
@@ -62,7 +67,7 @@ CASE WHEN tt.`产品标准名`="常润茶" THEN DATE_FORMAT(CONCAT(MID(tt.`产�
  tt.`产品价格`,
  tt.`产品金额`
 FROM
-( -- 
+( 
 SELECT
  tt.stock_date AS 库存日期,
  tt.cust_id AS 客户编号,
@@ -74,7 +79,7 @@ SELECT
  tt.stock_type AS 库存类型,
  tt.prod_name AS 产品名,
  tt.prod_spec AS 产品规格,
- CONVERT(tt.prod_batch ,DECIMAL(10,0))AS 产品批号,
+ CONVERT(tt.prod_batch ,DECIMAL(11,0))AS 产品批号,
 --  tt.prod_batch AS 产品批号,
  tt.prod_unit AS 产品单位,
  tt.prod_count AS 产品销量,
@@ -88,9 +93,9 @@ tt.*
 FROM
 agilesc_report.`库存主表信息` tt
 WHERE
- tt.prod_batch REGEXP "[0-9]"
+ tt.prod_batch NOT REGEXP '[A|C|#|_|!|@|$|%|"批号"]'
 AND
- LENGTH(tt.prod_batch)>3)tt
+ LENGTH(tt.prod_batch) BETWEEN 3 AND 11)tt
 LEFT JOIN
 agilesc_report.`客户信息主表` zz
 ON  tt.cust_id = zz.id
@@ -103,7 +108,19 @@ ORDER BY
  jj.`产品标准名` DESC
 )tt
 WHERE
- LENGTH(tt.`产品批号`)>1) tt-- 第二层
+ LENGTH(tt.`产品批号`)>1
+) tt
+LEFT JOIN
+(SELECT
+ tt.`省份`,
+ CASE WHEN tt.`地市`=tt.`区县` THEN tt.`地市` ELSE NULL END AS 省会城市,
+ CASE WHEN tt.`地市`=tt.`区县` THEN tt.`经度` ELSE NULL END AS 省会经度,
+ CASE WHEN tt.`地市`=tt.`区县` THEN tt.`纬度` ELSE NULL END AS 省会纬度
+FROM
+ agilesc_report.`全国省市经纬度` tt
+GROUP BY
+ tt.`省份`)t1
+ON tt.`客户所在省`=t1.省份
 WHERE
  tt.产品标准名 IS NOT NULL
 ORDER BY
@@ -112,68 +129,3 @@ ORDER BY
  tt.产品批号 DESC;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
--- 库存数据类型
-
-SELECT
- tt.stock_type
-FROM
- agilesc_report.`库存主表信息` tt
-GROUP BY
- tt.stock_type;
-
--- 产品数据类型
-
-SELECT
- tt.prod_name
-FROM
- agilesc_report.`库存主表信息` tt
-GROUP BY
- tt.prod_name;
-
-SELECT
- tt.,
- tt.`商品名称`,
- COUNT(DISTINCT tt.`客户`) AS 铺货门店数
-FROM
- agilesc_report.手机系统库存数据 tt
-GROUP BY
- tt.`客户区域`,
- tt.`商品名称`;
-
-
-
--- 通过批文补充产品名
-
-
-SELECT
- tt.prod_name,
- tt.prod_spec,
- zz.`物料名称`,
- zz.规格型号,
- tt.prod_batch
-FROM
- agilesc_report.`库存备份表` tt
-LEFT JOIN
- agilesc_report.`批号产品标准表` zz
-ON 
- tt.prod_batch = zz.`批次`;
- 
-
-SELECT
-tt.*
-FROM
-agilesc_report.`库存主表信息` tt
-WHERE
- tt.prod_batch REGEXP "[0-9]"
