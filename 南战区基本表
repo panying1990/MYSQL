@@ -18,7 +18,7 @@ clientvisit_threetimes INT COMMENT '拜访3次的户数',
 display_chenlie_lasttime INT COMMENT '有陈列的户数',
 display_ph_pt_lasttime INT COMMENT '有ph&pt的户数',
 display_pop_lasttime INT COMMENT '有ph&pt的户数',
-other_info_lasttime INT COMMENT '有断货的户数',
+display_duanhuo_lasttime INT COMMENT '有断货的户数',
 sale_duty_dis VARCHAR ( 255 ) COMMENT '是否为负责区域' 
 ) COMMENT = '手机系统统计周报基础表';
 INSERT INTO staff_visit_client_base (
@@ -37,7 +37,7 @@ clientvisit_threetimes,
 display_chenlie_lasttime,
 display_ph_pt_lasttime,
 display_pop_lasttime,
-other_info_lasttime,
+display_duanhuo_lasttime,
 sale_duty_dis 
 ) SELECT
 a.sale_manager,
@@ -55,7 +55,7 @@ a.clientvisit_threetimes,
 a.display_chenlie_lasttime,
 a.display_ph_pt_lasttime,
 a.display_pop_lasttime,
-a.other_info_lasttime,
+a.display_duanhuo_lasttime,
 CASE
 	
 	WHEN h.姓名 IS NULL THEN
@@ -79,7 +79,7 @@ FROM
 		sum( a.display_chenlie_lasttime ) AS display_chenlie_lasttime,
 		sum( a.display_ph_pt_lasttime ) AS display_ph_pt_lasttime,
 		sum( a.display_pop_lasttime ) AS display_pop_lasttime,
-		sum( a.other_info_lasttime ) AS other_info_lasttime 
+		sum( a.other_info_lasttime ) AS display_duanhuo_lasttime 
 	FROM
 		(
 		SELECT
@@ -113,8 +113,8 @@ FROM
 			END AS display_pop_lasttime,
 		CASE
 				
-				WHEN a.store_sum IS NULL THEN
-				0 ELSE a.store_sum AS other_info_lasttime 
+				WHEN a.store_sum >0 THEN
+				1 ELSE 0 end AS other_info_lasttime 
 			FROM
 				(
 				SELECT
@@ -211,9 +211,10 @@ FROM
 							g.sale_dis,
 							g.client_id,
 							g.client_type 
-						) g 
+						) g -- 南战区终端任务表数据汇总
 						ON CONCAT( d.sale_manager, d.sale_dis, d.client_id, d.client_type ) = CONCAT( g.sale_manager, g.sale_dis, g.client_id, g.client_type )
-						LEFT JOIN (
+						LEFT JOIN -- 左链接库存数据
+						(
 						SELECT
 							a.sale_manager,
 							a.sale_dis,
@@ -253,7 +254,8 @@ FROM
 									a.prodstore_volume ELSE 0 
 								END AS laili24 
 							FROM
-								store_log a )a
+								store_log a )
+								a
 							GROUP BY
 								a.sale_manager,
 								a.sale_dis,
