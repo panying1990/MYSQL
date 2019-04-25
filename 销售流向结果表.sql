@@ -1,0 +1,88 @@
+use agilesc_report;
+drop table if exists lx_sale_report;
+create table lx_sale_report(
+dist_name varchar(255) comment "上传客户名称",
+org_code_dist varchar(255) comment "客户所属组织",
+eas varchar(50) comment"EAS编码",
+dist_type varchar(50) comment "客户类型",
+up_cycle varchar(50) comment "上传周期",
+term_name varchar(255) comment "终端名称",
+org_code varchar(255) comment "终端所属组织",
+match_type_p varchar(50) comment "主数据类型(标准)",
+term_name_p varchar(255) comment "终端名称(标准)",
+term_type_p varchar(50) comment "终端类型(标准)",
+term_type_manual varchar(50) comment "终端类型(人工)",
+prod_count int comment "产品数量",
+prod_sys_type varchar(50) comment "产品品类(标准)",
+prod_spec_p varchar(50) comment "产品规格(标准)",
+prod_price_p float comment "产品单价",
+dist_first varchar(150) comment "一级区域",
+dist_second varchar(150) comment "二级区域",
+dist_third varchar(150) comment "三级区域",
+prod_type_spec varchar(150) comment "产品品类加规格",
+chang_25 int comment "常润茶25产品数量",
+chang_40 int comment "常润茶40产品数量",
+chang_100 int comment "常润茶100产品数量",
+jing_25 int comment "常菁茶25产品数量",
+jing_40 int comment "常菁茶40数量",
+kpi_flag varchar(150) comment "是否作为取值"
+)comment="导出流向报告";
+insert into lx_sale_report(
+dist_name,
+org_code_dist,
+eas,
+dist_type,
+up_cycle,
+term_name,
+org_code,
+match_type_p,
+term_name_p,
+term_type_p,
+term_type_manual,
+prod_count,
+prod_sys_type,
+prod_spec_p,
+prod_price_p,
+dist_first,
+dist_second,
+dist_third,
+prod_type_spec,
+chang_25,
+chang_40,
+chang_100,
+jing_25,
+jing_40,
+kpi_flag)
+select
+tt.dist_name,
+tt.org_code_dist,
+tt.eas,
+tt.dist_type,
+tt.up_cycle,
+tt.term_name,
+tt.org_code,
+tt.match_type_p,
+tt.term_name_p,
+tt.term_type_p,
+tt.term_type_manual,
+tt.prod_count,
+tt.prod_sys_type,
+tt.prod_spec_p,
+tt.prod_price_p,
+tt.dist_first,
+tt.dist_second,
+tt.dist_third,
+tt.prod_type_spec,
+case when tt.prod_type_spec = '常润茶25袋' then tt.prod_count else 0 end as chang_25,
+case when tt.prod_type_spec = '常润茶40袋' then tt.prod_count else 0 end as chang_40,
+case when tt.prod_type_spec = '常润茶100袋' then tt.prod_count else 0 end as chang_100,
+case when tt.prod_type_spec = '常菁茶25袋' then tt.prod_count else 0 end as jing_25,
+case when tt.prod_type_spec = '常菁茶40袋' then tt.prod_count else 0 end as jing_40,
+tt.kpi_flag
+from
+lx_sale_summary tt
+where
+tt.dist_first = '东战区' 
+or 
+tt.org_code_dist REGEXP '东战区';
+
